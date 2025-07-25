@@ -1,0 +1,20 @@
+{
+  "slack_webhook": "https://hooks.slack.com/services/TEST/WEBHOOK/URL",
+  "targets": [
+    {
+      "url": "https://httpbin.org/json",
+      "css_selector": "pre",
+      "current_value": "test-value-to-trigger-change"
+    },
+    {
+      "url": "https://httpbin.org/html",
+      "css_selector": "h1",
+      "current_value": "test-title-to-trigger-change"
+    },
+    {
+      "url": "https://httpbin.org/uuid",
+      "css_selector": "pre",
+      "current_value": "test-uuid-to-trigger-change"
+    }
+  ]
+}

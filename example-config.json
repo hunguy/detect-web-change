@@ -1,0 +1,15 @@
+{
+  "slack_webhook": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+  "targets": [
+    {
+      "url": "https://httpbin.org/json",
+      "css_selector": "pre",
+      "current_value": "{\n  \"slideshow\": {\n    \"author\": \"Yours Truly\", \n    \"date\": \"date of publication\", \n    \"slides\": [\n      {\n        \"title\": \"Wake up to WonderWidgets!\", \n        \"type\": \"all\"\n      }, \n      {\n        \"items\": [\n          \"Why <em>WonderWidgets</em> are great\", \n          \"Who <em>buys</em> WonderWidgets\"\n        ], \n        \"title\": \"Overview\", \n        \"type\": \"all\"\n      }\n    ], \n    \"title\": \"Sample Slide Show\"\n  }\n}"
+    },
+    {
+      "url": "https://httpbin.org/html",
+      "css_selector": "h1",
+      "current_value": "Herman Melville - Moby-Dick"
+    }
+  ]
+}

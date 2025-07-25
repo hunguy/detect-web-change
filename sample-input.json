@@ -1,0 +1,17 @@
+[
+  {
+    "url": "https://example.com/product1",
+    "css_selector": "#price",
+    "current_value": "$19.99"
+  },
+  {
+    "url": "https://example.com/product2",
+    "css_selector": ".title",
+    "current_value": "Product Name"
+  },
+  {
+    "url": "https://test-site.com/status",
+    "css_selector": "[data-status]",
+    "current_value": "Available"
+  }
+]

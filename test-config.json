@@ -1,0 +1,7 @@
+[
+  {
+    "url": "https://example.com",
+    "css_selector": "#test",
+    "current_value": "test value"
+  }
+]

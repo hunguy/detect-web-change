@@ -1,0 +1,42 @@
+{
+  "name": "web-element-change-detector",
+  "version": "1.0.0",
+  "description": "A CLI tool that monitors web pages for changes in specific DOM elements and provides automated notifications",
+  "main": "detect-change.js",
+  "bin": {
+    "detect-change": "./detect-change.js"
+  },
+  "scripts": {
+    "start": "node detect-change.js",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=src/",
+    "test:integration": "jest --testPathPattern=test/integration/",
+    "test:e2e": "jest --testPathPattern=end-to-end",
+    "test:performance": "jest --testPathPattern=performance",
+    "test:errors": "jest --testPathPattern=error-scenarios",
+    "test:workflow": "jest --testPathPattern=monitoring-workflow",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "web-monitoring",
+    "dom-changes",
+    "cli",
+    "playwright",
+    "slack-notifications"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "yargs": "^17.7.2",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
