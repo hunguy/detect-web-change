@@ -25,7 +25,7 @@ A Node.js CLI tool that monitors web pages for changes in specific DOM elements 
 
 ```bash
 git clone <repository-url>
-cd web-element-change-detector
+cd detect-web-change
 ```
 
 2. Install dependencies:
