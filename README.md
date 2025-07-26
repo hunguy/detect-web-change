@@ -243,6 +243,9 @@ Use cron (Linux/macOS) or Task Scheduler (Windows) to run the tool periodically:
 
 # Using local installation
 */30 * * * * /usr/bin/node /path/to/detect-change.js --input /path/to/config.json
+
+# Or run the shell script
+* * * * * /bin/zsh run-detect-change.sh
 ```
 
 ### Systemd Timer Example
