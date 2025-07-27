@@ -380,7 +380,7 @@ For deployment on remote machines (like Oracle Cloud VM):
 
 ```bash
 # 1. Transfer files to remote machine
-scp my-config.json user@remote-host:/home/user/detect-web-change/
+scp config.json user@remote-host:/home/user/detect-web-change/
 
 # 2. SSH into remote machine
 ssh user@remote-host
@@ -388,22 +388,9 @@ ssh user@remote-host
 # 3. Navigate to project directory
 cd detect-web-change
 
-# 4. Build and run with Slack webhook
+# 4. Build and run container. (Make sure .env and config.json exist)
 docker build -t website-change-detector .
-mkdir -p logs
-docker run -d --name change-detector \
-  -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/config.json:/app/config.json \
-  website-change-detector
-
-# Alternative: Create .env file for easier management
-echo "SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL" > .env
-docker run -d --name change-detector \
-  --env-file .env \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/config.json:/app/config.json \
-  website-change-detector
+./start-container.sh
 ```
 
 #### Configuration Updates
@@ -421,12 +408,7 @@ nano config.json
 docker stop change-detector
 docker rm change-detector
 
-# Restart with updated environment
-docker run -d --name change-detector \
-  -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/NEW/WEBHOOK/URL" \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/config.json:/app/config.json \
-  website-change-detector
+./start-container.sh
 ```
 
 #### Environment Variable Priority

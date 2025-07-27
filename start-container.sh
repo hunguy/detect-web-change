@@ -22,8 +22,9 @@ fi
 echo "Starting Docker container with config.json mounted as file..."
 
 # Run Docker container
+# REQUIREMENT: config.json and .env exists
 docker run -d --name change-detector \
-  -e SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-https://hooks.slack.com/services/YOUR/WEBHOOK/URL}" \
+  --env-file .env \
   -v $(pwd)/logs:/app/logs \
   -v $(pwd)/config.json:/app/config.json \
   website-change-detector

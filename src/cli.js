@@ -27,14 +27,14 @@ class CLIController {
     try {
       const args = yargs(hideBin(argv))
         .usage(
-          "Usage: $0 --input <config-file> [--slack-webhook <webhook-url>]"
+          "Usage: $0 [--input <config-file>] [--slack-webhook <webhook-url>]"
         )
         .option("input", {
           alias: "i",
           type: "string",
-          describe: "Path to the input configuration JSON file",
-          demandOption: true,
-          requiresArg: true,
+          describe:
+            "Path to the input configuration JSON file (defaults to config.json)",
+          requiresArg: false,
         })
         .option("slack-webhook", {
           alias: "s",
@@ -47,13 +47,17 @@ class CLIController {
         .alias("help", "h")
         .version("1.0.0")
         .alias("version", "v")
-        .example("$0 --input config.json", "Monitor using config.json file")
+        .example("$0", "Monitor using default config.json file")
         .example(
-          "$0 --input config.json --slack-webhook https://hooks.slack.com/...",
+          "$0 --input my-config.json",
+          "Monitor using specific config file"
+        )
+        .example(
+          "$0 --slack-webhook https://hooks.slack.com/...",
           "Monitor with Slack notifications via CLI"
         )
         .example(
-          "SLACK_WEBHOOK_URL=https://hooks.slack.com/... $0 --input config.json",
+          "SLACK_WEBHOOK_URL=https://hooks.slack.com/... $0",
           "Monitor using environment variable for Slack webhook"
         )
         .example(
@@ -160,7 +164,9 @@ For more information, visit: https://github.com/your-repo/web-element-change-det
    */
   displayUsage() {
     yargs()
-      .usage("Usage: $0 --input <config-file> [--slack-webhook <webhook-url>]")
+      .usage(
+        "Usage: $0 [--input <config-file>] [--slack-webhook <webhook-url>]"
+      )
       .option("input", {
         alias: "i",
         type: "string",
