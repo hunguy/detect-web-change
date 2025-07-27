@@ -73,6 +73,10 @@ Create a JSON configuration file with monitoring targets and optional settings:
 
 ### Configuration Fields
 
+#### Default Configuration File
+
+The application uses `config.json` in the project root as the default configuration file if no `--input` parameter is provided. This makes it easy to run the tool without specifying a config file path.
+
 #### Global Settings
 
 - **slack_webhook** (optional): Slack webhook URL for notifications. If provided, this will be used unless overridden by CLI arguments or environment variables.
@@ -108,8 +112,11 @@ node detect-change.js --input config.json
 ### Global Usage (after npm link)
 
 ```bash
-# Basic usage from any directory
-detect-change --input config.json
+# Basic usage (uses config.json by default)
+detect-change
+
+# With specific config file
+detect-change --input my-config.json
 
 # With full path to config
 detect-change --input /path/to/config.json
@@ -259,15 +266,17 @@ docker build -t website-change-detector .
 # Create logs directory on host
 mkdir -p logs
 
-# Option 1: Run with Slack webhook environment variable
+# Option 1: Run with config.json mounted (recommended)
 docker run -d --name change-detector \
   -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
   -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/config.json:/app/config.json \
   website-change-detector
 
-# Option 2: Run without Slack (uses webhook from config file)
+# Option 2: Run without Slack environment variable (uses webhook from config.json)
 docker run -d --name change-detector \
   -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/config.json:/app/config.json \
   website-change-detector
 
 # Option 3: Use environment file
@@ -275,17 +284,27 @@ echo "SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL" > .en
 docker run -d --name change-detector \
   --env-file .env \
   -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/config.json:/app/config.json \
   website-change-detector
 
 # Check if container is running
 docker ps
 ```
 
+**Benefits of mounting config.json:**
+
+- Edit configuration on host without rebuilding container
+- Changes take effect on next cron run
+- Easy to update monitoring targets
+
 #### Manual Testing
 
 ```bash
-# Test the script manually
+# Test the script manually (uses config.json by default)
 docker exec change-detector /app/run-detect-change-docker.sh
+
+# Test with specific config file
+docker exec change-detector node detect-change.js --input my-config.json
 
 # Check the logs
 tail -f logs/detect-change.log
@@ -333,7 +352,7 @@ For deployment on remote machines (like Oracle Cloud VM):
 
 ```bash
 # 1. Transfer files to remote machine
-scp -r . user@remote-host:/home/user/detect-web-change/
+scp my-config.json user@remote-host:/home/user/detect-web-change/
 
 # 2. SSH into remote machine
 ssh user@remote-host
@@ -347,6 +366,7 @@ mkdir -p logs
 docker run -d --name change-detector \
   -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
   -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/config.json:/app/config.json \
   website-change-detector
 
 # Alternative: Create .env file for easier management
@@ -354,26 +374,30 @@ echo "SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL" > .en
 docker run -d --name change-detector \
   --env-file .env \
   -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/config.json:/app/config.json \
   website-change-detector
 ```
 
 #### Configuration Updates
 
-To update your configuration without rebuilding:
+With config.json mounted, you can update configuration without rebuilding:
 
 ```bash
-# Stop the container
-docker stop change-detector
+# Simply edit the config.json file on your host
+nano config.json
 
-# Update your config file (my-config.json) or environment variables
-# Then rebuild and restart
-docker build -t website-change-detector .
+# Changes will take effect on the next cron run
+# No need to restart the container!
+
+# To update environment variables, restart the container:
+docker stop change-detector
 docker rm change-detector
 
 # Restart with updated environment
 docker run -d --name change-detector \
   -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/NEW/WEBHOOK/URL" \
   -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/config.json:/app/config.json \
   website-change-detector
 ```
 

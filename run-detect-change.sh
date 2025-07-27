@@ -8,4 +8,4 @@ source "$NVM_DIR/nvm.sh"
 nvm use 20
 cd /Users/henry/Projects/detect-website-change
 # Run your script
-node detect-change.js --input my-config.json >> detect-change.log 2>&1
+node detect-change.js >> detect-change.log 2>&1

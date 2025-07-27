@@ -102,15 +102,11 @@ For more information, visit: https://github.com/your-repo/web-element-change-det
   async validateArgs(args) {
     const validatedArgs = { ...args };
 
-    // Validate input file path
-    if (!args.input) {
-      throw new Error(
-        "Input configuration file path is required. Use --input <file-path>"
-      );
-    }
+    // Use config.json as default if no input file specified
+    const inputFile = args.input || "config.json";
 
     // Resolve input file path
-    const inputPath = path.resolve(args.input);
+    const inputPath = path.resolve(inputFile);
 
     // Validate input file is JSON first (before checking file access)
     if (!inputPath.toLowerCase().endsWith(".json")) {
