@@ -266,12 +266,27 @@ docker build -t website-change-detector .
 # Create logs directory on host
 mkdir -p logs
 
+# Ensure config.json exists as a file (not directory)
+if [ -d "config.json" ]; then
+  echo "Warning: config.json is a directory, removing it..."
+  rm -rf config.json
+fi
+
+if [ ! -f "config.json" ]; then
+  echo "Creating default config.json..."
+  cp my-config.json config.json
+fi
+
 # Option 1: Run with config.json mounted (recommended)
+# Make sure config.json is a file, not a directory
 docker run -d --name change-detector \
   -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
   -v $(pwd)/logs:/app/logs \
   -v $(pwd)/config.json:/app/config.json \
   website-change-detector
+
+# Alternative: Use the provided script that handles file validation
+# chmod +x start-container.sh && ./start-container.sh
 
 # Option 2: Run without Slack environment variable (uses webhook from config.json)
 docker run -d --name change-detector \
@@ -296,6 +311,19 @@ docker ps
 - Edit configuration on host without rebuilding container
 - Changes take effect on next cron run
 - Easy to update monitoring targets
+
+**Using the provided start-container.sh script:**
+
+```bash
+# Make the script executable
+chmod +x start-container.sh
+
+# Run with automatic file validation
+./start-container.sh
+
+# Or with custom Slack webhook
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" ./start-container.sh
+```
 
 #### Manual Testing
 
@@ -344,7 +372,7 @@ The Docker container automatically runs the monitoring script at:
 - **20:00** (8 PM)
 - **22:00** (10 PM)
 
-To modify the schedule, edit the cron expression in the `start.sh` file and rebuild the container.
+To modify the schedule, edit the cron expression in the `start-cron.sh` file and rebuild the container.
 
 #### Remote Deployment
 
@@ -526,10 +554,10 @@ docker exec change-detector service cron restart
 
 #### Setting Up Better Monitoring
 
-For better monitoring, you can modify the start.sh to create a more verbose cron job:
+For better monitoring, you can modify the start-cron.sh to create a more verbose cron job:
 
 ```bash
-# Edit start.sh to add cron logging (note: requires 'root' user specification for /etc/cron.d/ files)
+# Edit start-cron.sh to add cron logging (note: requires 'root' user specification for /etc/cron.d/ files)
 echo "0 0,12,14,16,18,20,22 * * * root echo \"\$(date): Starting monitoring...\" >> /app/logs/cron.log && /app/run-detect-change-docker.sh && echo \"\$(date): Monitoring completed\" >> /app/logs/cron.log" >> /etc/cron.d/detect-change
 ```
 
@@ -545,6 +573,20 @@ docker logs change-detector
 # - Missing config file
 # - Chrome/Chromium not found
 # - Permission issues
+```
+
+**config.json mounting issues:**
+
+```bash
+# Check if config.json is a file (not directory)
+ls -la config.json
+
+# If it's a directory, fix it:
+rm -rf config.json
+cp my-config.json config.json
+
+# Verify it's a file
+file config.json  # Should show "JSON data" or "ASCII text"
 ```
 
 **Log files not appearing:**

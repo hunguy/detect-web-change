@@ -46,10 +46,10 @@ RUN npx playwright install chromium
 RUN chmod +x run-detect-change-docker.sh
 
 # Make startup script executable
-RUN chmod +x /app/start.sh
+RUN chmod +x /app/start-cron.sh
 
 # Create logs directory and log file
 RUN mkdir -p /app/logs && touch /app/logs/detect-change.log
 
 # Start with the startup script
-CMD ["/app/start.sh"]
+CMD ["/app/start-cron.sh"]
