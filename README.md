@@ -288,7 +288,7 @@ docker ps
 docker exec change-detector /app/run-detect-change-docker.sh
 
 # Check the logs
-cat logs/detect-change.log
+tail -f logs/detect-change.log
 
 # Or view container logs
 docker logs change-detector
@@ -325,11 +325,7 @@ The Docker container automatically runs the monitoring script at:
 - **20:00** (8 PM)
 - **22:00** (10 PM)
 
-To modify the schedule, edit the cron expression in the `Dockerfile`:
-
-```dockerfile
-RUN echo "0 0,12,14,16,18,20,22 * * * /app/run-detect-change-docker.sh" > /etc/cron.d/detect-change
-```
+To modify the schedule, edit the cron expression in the `start.sh` file and rebuild the container.
 
 #### Remote Deployment
 
@@ -433,6 +429,9 @@ docker exec change-detector service cron status
 
 # Restart cron if needed
 docker exec change-detector service cron restart
+
+# If crontab shows "no crontab for root", reinstall it
+docker exec change-detector crontab /etc/cron.d/detect-change
 ```
 
 **Environment variables not working:**
@@ -468,13 +467,46 @@ docker exec change-detector df -h
 docker exec change-detector touch /app/logs/test.log
 ```
 
+#### Temporarily Changing Cron Schedule for Testing
+
+To quickly test with a different schedule without rebuilding:
+
+```bash
+# Change to run every minute for testing
+docker exec change-detector bash -c 'cat > /etc/cron.d/detect-change << EOF
+SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+* * * * * root /app/run-detect-change-docker.sh
+EOF'
+
+docker exec change-detector chmod 0644 /etc/cron.d/detect-change
+docker exec change-detector crontab /etc/cron.d/detect-change
+docker exec change-detector service cron restart
+
+# Watch logs to see it running every minute
+tail -f logs/detect-change.log
+
+# Change back to original schedule
+docker exec change-detector bash -c 'cat > /etc/cron.d/detect-change << EOF
+SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+0 0,12,14,16,18,20,22 * * * root /app/run-detect-change-docker.sh
+EOF'
+
+docker exec change-detector chmod 0644 /etc/cron.d/detect-change
+docker exec change-detector crontab /etc/cron.d/detect-change
+docker exec change-detector service cron restart
+```
+
 #### Setting Up Better Monitoring
 
 For better monitoring, you can modify the start.sh to create a more verbose cron job:
 
 ```bash
-# Edit start.sh to add cron logging
-echo "0 0,12,14,16,18,20,22 * * * echo \"\$(date): Starting monitoring...\" >> /app/logs/cron.log && /app/run-detect-change-docker.sh && echo \"\$(date): Monitoring completed\" >> /app/logs/cron.log" >> /etc/cron.d/detect-change
+# Edit start.sh to add cron logging (note: requires 'root' user specification for /etc/cron.d/ files)
+echo "0 0,12,14,16,18,20,22 * * * root echo \"\$(date): Starting monitoring...\" >> /app/logs/cron.log && /app/run-detect-change-docker.sh && echo \"\$(date): Monitoring completed\" >> /app/logs/cron.log" >> /etc/cron.d/detect-change
 ```
 
 #### Troubleshooting Docker Deployment
