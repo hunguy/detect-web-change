@@ -63,6 +63,8 @@ class ChromeLauncher {
         ].filter(Boolean);
       case "linux":
         return [
+          // Playwright's Chromium path (should be first priority)
+          "/root/.cache/ms-playwright/chromium-1181/chrome-linux/chrome",
           "/usr/bin/google-chrome",
           "/usr/bin/google-chrome-stable",
           "/usr/bin/chromium",
