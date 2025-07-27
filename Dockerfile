@@ -24,8 +24,7 @@ RUN apt-get update && apt-get install -y \
     libxfixes3 \
     libnss3 \
     libcups2 \
-    libxss1 \
-    libxrandr2 \
+    libgbm1 \
     cron \
     && rm -rf /var/lib/apt/lists/*
 
@@ -51,8 +50,8 @@ RUN echo "0 0,12,14,16,18,20,22 * * * /app/run-detect-change-docker.sh" > /etc/c
     chmod 0644 /etc/cron.d/detect-change && \
     crontab /etc/cron.d/detect-change
 
-# Create log directory
-RUN mkdir -p /app/logs && touch /app/detect-change.log
+# Create log file (will be mounted from host)
+RUN touch /app/detect-change.log
 
 # Start cron and keep container running
 CMD ["sh", "-c", "cron && tail -f /app/detect-change.log"]
