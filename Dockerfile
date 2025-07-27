@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     libcups2 \
     libgbm1 \
     cron \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

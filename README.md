@@ -263,30 +263,9 @@ docker build -t website-change-detector .
 #### Run the Container
 
 ```bash
-# Create logs directory on host
-mkdir -p logs
 
-# Ensure config.json exists as a file (not directory)
-if [ -d "config.json" ]; then
-  echo "Warning: config.json is a directory, removing it..."
-  rm -rf config.json
-fi
-
-if [ ! -f "config.json" ]; then
-  echo "Creating default config.json..."
-  cp my-config.json config.json
-fi
-
-# Option 1: Run with config.json mounted (recommended)
-# Make sure config.json is a file, not a directory
-docker run -d --name change-detector \
-  -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/config.json:/app/config.json \
-  website-change-detector
-
-# Alternative: Use the provided script that handles file validation
-# chmod +x start-container.sh && ./start-container.sh
+# Option 1: Use the provided script that handles file validation (config.json and .env need to exist)
+chmod +x start-container.sh && ./start-container.sh
 
 # Option 2: Run without Slack environment variable (uses webhook from config.json)
 docker run -d --name change-detector \
@@ -311,19 +290,6 @@ docker ps
 - Edit configuration on host without rebuilding container
 - Changes take effect on next cron run
 - Easy to update monitoring targets
-
-**Using the provided start-container.sh script:**
-
-```bash
-# Make the script executable
-chmod +x start-container.sh
-
-# Run with automatic file validation
-./start-container.sh
-
-# Or with custom Slack webhook
-SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" ./start-container.sh
-```
 
 #### Manual Testing
 
@@ -447,6 +413,8 @@ ls -la logs/detect-change.log
 
 # 8. Test the script manually to ensure it works
 docker exec change-detector /app/run-detect-change-docker.sh
+# or
+docker exec change-detector node detect-change.js
 
 # 9. Check container uptime and status
 docker ps
