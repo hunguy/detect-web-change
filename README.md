@@ -389,6 +389,94 @@ The application uses Slack webhooks in this priority order:
 2. `slack_webhook` field in configuration file
 3. No notifications if neither is provided
 
+#### Monitoring Cron Jobs
+
+To verify that cron jobs are running properly in the Docker container:
+
+```bash
+# 1. Check if cron daemon is running
+docker exec change-detector ps aux | grep cron
+
+# 2. View the installed crontab
+docker exec change-detector crontab -l
+
+# 3. Check cron job configuration
+docker exec change-detector cat /etc/cron.d/detect-change
+
+# 4. View cron logs (if available)
+docker exec change-detector tail -f /var/log/cron.log
+
+# 5. Check application logs for scheduled runs
+cat logs/detect-change.log
+
+# 6. Monitor logs in real-time
+tail -f logs/detect-change.log
+
+# 7. Check last modification time of log file
+ls -la logs/detect-change.log
+
+# 8. Test the script manually to ensure it works
+docker exec change-detector /app/run-detect-change-docker.sh
+
+# 9. Check container uptime and status
+docker ps
+docker stats change-detector
+```
+
+#### Debugging Cron Issues
+
+**Cron not running:**
+
+```bash
+# Check if cron service started
+docker exec change-detector service cron status
+
+# Restart cron if needed
+docker exec change-detector service cron restart
+```
+
+**Environment variables not working:**
+
+```bash
+# Check what environment variables cron has
+docker exec change-detector cat /etc/cron.d/detect-change
+
+# Verify environment variables in container
+docker exec change-detector env | grep SLACK
+```
+
+**Script not executing:**
+
+```bash
+# Check script permissions
+docker exec change-detector ls -la /app/run-detect-change-docker.sh
+
+# Test script manually with same environment as cron
+docker exec change-detector bash -c "cd /app && ./run-detect-change-docker.sh"
+```
+
+**Log file issues:**
+
+```bash
+# Check if log directory exists and is writable
+docker exec change-detector ls -la /app/logs/
+
+# Check disk space
+docker exec change-detector df -h
+
+# Check for permission issues
+docker exec change-detector touch /app/logs/test.log
+```
+
+#### Setting Up Better Monitoring
+
+For better monitoring, you can modify the start.sh to create a more verbose cron job:
+
+```bash
+# Edit start.sh to add cron logging
+echo "0 0,12,14,16,18,20,22 * * * echo \"\$(date): Starting monitoring...\" >> /app/logs/cron.log && /app/run-detect-change-docker.sh && echo \"\$(date): Monitoring completed\" >> /app/logs/cron.log" >> /etc/cron.d/detect-change
+```
+
 #### Troubleshooting Docker Deployment
 
 **Container exits immediately:**
