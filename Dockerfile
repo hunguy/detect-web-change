@@ -50,8 +50,8 @@ RUN echo "0 0,12,14,16,18,20,22 * * * /app/run-detect-change-docker.sh" > /etc/c
     chmod 0644 /etc/cron.d/detect-change && \
     crontab /etc/cron.d/detect-change
 
-# Create logs directory
-RUN mkdir -p /app/logs
+# Create logs directory and log file
+RUN mkdir -p /app/logs && touch /app/logs/detect-change.log
 
 # Start cron and keep container running
 CMD ["sh", "-c", "cron && tail -f /app/logs/detect-change.log"]
