@@ -231,6 +231,192 @@ When changes are detected, the tool sends formatted notifications to Slack:
 3. Create a new webhook for your desired channel
 4. Copy the webhook URL and use it with the `--slack-webhook` option
 
+## Docker Deployment
+
+### Building and Running with Docker
+
+The application can be deployed using Docker for consistent execution across different environments.
+
+#### Prerequisites
+
+- Docker installed on your target machine
+- Your configuration file (`my-config.json` or similar)
+
+#### Build the Docker Image
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd detect-web-change
+
+# Build the Docker image
+docker build -t website-change-detector .
+```
+
+#### Run the Container
+
+```bash
+# Create logs directory on host
+mkdir -p logs
+
+# Option 1: Run with Slack webhook environment variable
+docker run -d --name change-detector \
+  -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
+  -v $(pwd)/logs:/app/logs \
+  website-change-detector
+
+# Option 2: Run without Slack (uses webhook from config file)
+docker run -d --name change-detector \
+  -v $(pwd)/logs:/app/logs \
+  website-change-detector
+
+# Option 3: Use environment file
+echo "SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL" > .env
+docker run -d --name change-detector \
+  --env-file .env \
+  -v $(pwd)/logs:/app/logs \
+  website-change-detector
+
+# Check if container is running
+docker ps
+```
+
+#### Manual Testing
+
+```bash
+# Test the script manually
+docker exec change-detector /app/run-detect-change-docker.sh
+
+# Check the logs
+cat logs/detect-change.log
+
+# Or view container logs
+docker logs change-detector
+```
+
+#### Container Management
+
+```bash
+# Stop the container
+docker stop change-detector
+
+# Start the container
+docker start change-detector
+
+# Remove the container
+docker rm change-detector
+
+# View real-time logs
+docker logs -f change-detector
+
+# Access container shell for debugging
+docker exec -it change-detector /bin/bash
+```
+
+#### Scheduled Execution
+
+The Docker container automatically runs the monitoring script at:
+
+- **00:00** (midnight)
+- **12:00** (noon)
+- **14:00** (2 PM)
+- **16:00** (4 PM)
+- **18:00** (6 PM)
+- **20:00** (8 PM)
+- **22:00** (10 PM)
+
+To modify the schedule, edit the cron expression in the `Dockerfile`:
+
+```dockerfile
+RUN echo "0 0,12,14,16,18,20,22 * * * /app/run-detect-change-docker.sh" > /etc/cron.d/detect-change
+```
+
+#### Remote Deployment
+
+For deployment on remote machines (like Oracle Cloud VM):
+
+```bash
+# 1. Transfer files to remote machine
+scp -r . user@remote-host:/home/user/detect-web-change/
+
+# 2. SSH into remote machine
+ssh user@remote-host
+
+# 3. Navigate to project directory
+cd detect-web-change
+
+# 4. Build and run with Slack webhook
+docker build -t website-change-detector .
+mkdir -p logs
+docker run -d --name change-detector \
+  -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
+  -v $(pwd)/logs:/app/logs \
+  website-change-detector
+
+# Alternative: Create .env file for easier management
+echo "SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL" > .env
+docker run -d --name change-detector \
+  --env-file .env \
+  -v $(pwd)/logs:/app/logs \
+  website-change-detector
+```
+
+#### Configuration Updates
+
+To update your configuration without rebuilding:
+
+```bash
+# Stop the container
+docker stop change-detector
+
+# Update your config file (my-config.json) or environment variables
+# Then rebuild and restart
+docker build -t website-change-detector .
+docker rm change-detector
+
+# Restart with updated environment
+docker run -d --name change-detector \
+  -e SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/NEW/WEBHOOK/URL" \
+  -v $(pwd)/logs:/app/logs \
+  website-change-detector
+```
+
+#### Environment Variable Priority
+
+The application uses Slack webhooks in this priority order:
+
+1. `SLACK_WEBHOOK_URL` environment variable (highest priority)
+2. `slack_webhook` field in configuration file
+3. No notifications if neither is provided
+
+#### Troubleshooting Docker Deployment
+
+**Container exits immediately:**
+
+```bash
+# Check container logs
+docker logs change-detector
+
+# Common issues:
+# - Missing config file
+# - Chrome/Chromium not found
+# - Permission issues
+```
+
+**Log files not appearing:**
+
+```bash
+# Ensure logs directory exists and has proper permissions
+mkdir -p logs
+chmod 755 logs
+
+# Check if volume mount is working
+docker exec change-detector ls -la /app/logs/
+```
+
+**Chrome executable errors:**
+The Docker image includes Playwright's Chromium. If you see Chrome executable errors, the container may need to be rebuilt with updated dependencies.
+
 ## Scheduling
 
 Use cron (Linux/macOS) or Task Scheduler (Windows) to run the tool periodically:

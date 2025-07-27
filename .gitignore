@@ -269,4 +269,3 @@ local-*
 .env.*
 !.env.example
 
-my-config.json

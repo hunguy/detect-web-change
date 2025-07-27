@@ -1,0 +1,24 @@
+{
+  "targets": [
+    {
+      "url": "https://www.zara.com/us/en/leather-dress-shoes-p12492520.html?v1=432976225",
+      "css_selector": "#main > div > div > div.product-detail-view__main-content > div.product-detail-view__main-info > div > div.product-detail-info__info > div.product-detail-info__price > div > span > ins > span.price-current__amount > div > span",
+      "current_value": "$ 47.70"
+    },
+    {
+      "url": "https://www.zara.com/us/en/leather-dress-shoes-p12475520.html?v1=425519629",
+      "css_selector": "#main > div > div > div.product-detail-view__main-content > div.product-detail-view__main-info > div > div.product-detail-info__info > div.product-detail-info__price > div > span > ins > span.price-current__amount > div > span",
+      "current_value": "$ 59.70"
+    },
+    {
+      "url": "https://www.hollisterco.com/shop/us/p/above-the-knee-distressed-loose-denim-shorts-56770830?faceout=model&seq=04&pagefm=navigation-swatch&prodvm=navigation-swatch",
+      "css_selector": "#product-mfe-web-service-ProductPageFrontend > div > div.product-page-content-container > div > section > div > div.product-page-info-container-mfe > div:nth-child(1) > div.product-price-container > span > span.product-price-text-wrapper > span",
+      "current_value": "$44.95"
+    },
+    {
+      "url": "https://www.abercrombie.com/shop/us/p/loose-denim-short-58978820?faceout=model&seq=10&pagefm=navigation-grid&prodvm=navigation-grid",
+      "css_selector": "#product-mfe-web-service-ProductPageFrontend > div > div.product-page-content-container > div > section > div > div.product-page-info-container-mfe > div:nth-child(1) > div.product-price-container > span > span.product-price-text-wrapper > span",
+      "current_value": "$60"
+    }
+  ]
+}

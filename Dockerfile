@@ -45,13 +45,11 @@ RUN npx playwright install chromium
 # Make docker shell script executable
 RUN chmod +x run-detect-change-docker.sh
 
-# Create crontab file
-RUN echo "0 0,12,14,16,18,20,22 * * * /app/run-detect-change-docker.sh" > /etc/cron.d/detect-change && \
-    chmod 0644 /etc/cron.d/detect-change && \
-    crontab /etc/cron.d/detect-change
+# Make startup script executable
+RUN chmod +x /app/start.sh
 
 # Create logs directory and log file
 RUN mkdir -p /app/logs && touch /app/logs/detect-change.log
 
-# Start cron and keep container running
-CMD ["sh", "-c", "cron && tail -f /app/logs/detect-change.log"]
+# Start with the startup script
+CMD ["/app/start.sh"]
